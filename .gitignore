@@ -13,3 +13,6 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+#API ID and Key
+.env
