@@ -29,7 +29,7 @@ conn = psycopg2.connect(
     host="localhost",
     database="transport_data",
     user="postgres",
-    password="your_password_here"
+    password="1000lordofrings"
 )
 cur = conn.cursor()
 
