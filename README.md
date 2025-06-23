@@ -34,7 +34,7 @@ This project builds a data ingestion pipeline to fetch live bus departure data f
 
 ### 📦 Install Python packages
 
-```bash
+bash
 pip install psycopg2-binary requests python-dotenv
 
 🗄️ Database Setup
