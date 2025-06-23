@@ -1,8 +1,8 @@
 import os
 import requests
 import psycopg2
-import json
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Load secrets from .env
 load_dotenv()
@@ -16,8 +16,8 @@ url = f"https://transportapi.com/v3/uk/bus/stop/{ATCO_CODE}/live.json"
 params = {
     "app_id": APP_ID,
     "app_key": APP_KEY,
-    "group": "route",  # Grouped by bus line (e.g., "188", "98")
-    "limit": 5,
+    "group": "route",      # Group by bus line
+    "limit": 15,           # Collect more data per hour
     "nextbuses": "yes"
 }
 
@@ -32,10 +32,11 @@ if response.status_code != 200:
 
 data = response.json()
 
-# Print the grouped line codes to confirm structure
-print("🚌 Grouped by line:", list(data.get("departures", {}).keys()))
+# Print grouped lines
+departures_by_line = data.get("departures", {})
+print("🚌 Grouped by line:", list(departures_by_line.keys()))
 
-# Connect to the PostgreSQL database
+# Database connection
 try:
     conn = psycopg2.connect(
         host="localhost",
@@ -48,12 +49,12 @@ except Exception as e:
     print("❌ Failed to connect to database:", e)
     exit()
 
+# Metadata
 stop_name = data.get("stop_name", "Unknown")
-
-# Loop through each line group
-departures_by_line = data.get("departures", {})
+fetched_at = datetime.now()
 insert_count = 0
 
+# Loop through each line group
 for line_code, departures in departures_by_line.items():
     for service in departures:
         line = service.get("line")
@@ -62,23 +63,27 @@ for line_code, departures in departures_by_line.items():
         expected = service.get("expected_departure_time")
         operator = service.get("operator_name")
 
-        print(f"🚍 Inserting: {line}, {direction}, {aimed}, {expected}, {operator}, {stop_name}")
+        print(f"🚍 Inserting: {line}, {direction}, {aimed}, {expected}, {operator}, {stop_name}, {fetched_at}")
 
         try:
             cur.execute("""
                 INSERT INTO bus_live_data (
                     line_name, direction, aimed_departure,
-                    expected_departure, operator_name, stop_name, atcocode
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """, (line, direction, aimed, expected, operator, stop_name, ATCO_CODE))
+                    expected_departure, operator_name,
+                    stop_name, atcocode, fetched_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                line, direction, aimed, expected,
+                operator, stop_name, ATCO_CODE, fetched_at
+            ))
             insert_count += 1
         except Exception as e:
             print("❌ Insert error:", e)
             continue
 
-# Finalize DB transaction
+# Finalize
 conn.commit()
 cur.close()
 conn.close()
 
-print(f"✅ {insert_count} rows inserted into PostgreSQL.")
+print(f"✅ {insert_count} rows inserted into PostgreSQL at {fetched_at.strftime('%Y-%m-%d %H:%M:%S')}")
