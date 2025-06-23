@@ -25,14 +25,14 @@ This project builds a data ingestion pipeline to fetch live bus departure data f
 
 ## 🛠️ Setup Instructions
 
-### 📋 Prerequisites
+## 📋 Prerequisites
 
 - 🐍 Python 3.11+ installed  
 - 🐘 PostgreSQL 17 installed and running locally  
 - 📦 Python packages installed: `psycopg2-binary`, `requests`, `python-dotenv`  
 - 🐙 Git installed (optional for version control)
 
-### 📦 Install Python packages
+## 📦 Install Python packages
 
 bash
 pip install psycopg2-binary requests python-dotenv
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS bus_live_data (
 );
 Make sure the database user (e.g., postgres) has proper permissions.
 
-🔑 Environment Variables
+## 🔑 Environment Variables
 Create a .env file in the root project folder:
 
 ini
@@ -68,7 +68,7 @@ APP_ID=your_transportapi_app_id
 APP_KEY=your_transportapi_app_key
 Add .env to .gitignore to avoid committing sensitive information.
 
-🐍 Python Script
+## 🐍 Python Script
 The main ingestion script is fetch_live_data_hourly.py.
 
 This script fetches live bus data and inserts it into PostgreSQL.
@@ -86,7 +86,7 @@ cd /d "C:\Users\PC\transport-api-pipeline\scripts"
 "C:\Users\PC\AppData\Local\Programs\Python\Python311\python.exe" fetch_live_data_hourly.py
 Schedule this .bat file to run every hour using Windows Task Scheduler (see project documentation).
 
-📊 Data Collection Plan
+## 📊 Data Collection Plan
 The pipeline fetches 15 bus departure records every hour.
 
 Planned to collect data for at least one month to analyze:
@@ -99,7 +99,7 @@ Delay patterns
 
 Anomaly detection
 
-🔜 Next Steps
+## 🔜 Next Steps
 Perform exploratory data analysis (EDA) after initial data collection.
 
 Build dashboards or visualizations (Power BI, Tableau, or Python matplotlib/seaborn).
@@ -108,7 +108,7 @@ Develop predictive models for bus delays or ridership forecasting.
 
 Extend the project to include multiple bus stops or other transport modes.
 
-🛠️ Troubleshooting
+## 🛠️ Troubleshooting
 If the script fails, check:
 
 Your .env file contains correct API keys.
@@ -119,7 +119,7 @@ Required Python packages are installed (requests, psycopg2-binary, python-dotenv
 
 Paths in the .bat file are correct.
 
-📄 License
+## 📄 License
 This project is open-source and free to use.
 
 Created by Andrej Apchevski
