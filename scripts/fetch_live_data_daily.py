@@ -16,8 +16,8 @@ url = f"https://transportapi.com/v3/uk/bus/stop/{ATCO_CODE}/live.json"
 params = {
     "app_id": APP_ID,
     "app_key": APP_KEY,
-    "group": "route",      # Group by bus line
-    "limit": 15,           # Collect more data per hour
+    "group": "route",
+    "limit": 100,  # Daily mode
     "nextbuses": "yes"
 }
 
@@ -31,12 +31,13 @@ if response.status_code != 200:
     exit()
 
 data = response.json()
-
-# Print grouped lines
 departures_by_line = data.get("departures", {})
 print("🚌 Grouped by line:", list(departures_by_line.keys()))
+print(f"📊 Total lines fetched: {len(departures_by_line)}")
+for line_code, departures in departures_by_line.items():
+    print(f"   🚌 Line {line_code}: {len(departures)} departures")
 
-# Database connection
+# Connect to PostgreSQL
 try:
     conn = psycopg2.connect(
         host="localhost",
@@ -54,7 +55,7 @@ stop_name = data.get("stop_name", "Unknown")
 fetched_at = datetime.now()
 insert_count = 0
 
-# Loop through each line group
+# Insert into bus_live_data
 for line_code, departures in departures_by_line.items():
     for service in departures:
         line = service.get("line")
@@ -81,7 +82,6 @@ for line_code, departures in departures_by_line.items():
             print("❌ Insert error:", e)
             continue
 
-# Finalize
 conn.commit()
 cur.close()
 conn.close()
