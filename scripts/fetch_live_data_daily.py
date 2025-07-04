@@ -43,7 +43,7 @@ try:
         host="localhost",
         database="transport_data",
         user="postgres",
-        password="1000lordofrings"
+        password="admin"
     )
     cur = conn.cursor()
 except Exception as e:
